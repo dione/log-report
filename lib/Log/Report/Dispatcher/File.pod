@@ -1,0 +1,176 @@
+=head1 NAME
+
+Log::Report::Dispatcher::File - send messages to a file or file-handle
+
+=head1 INHERITANCE
+
+ Log::Report::Dispatcher::File
+   is a Log::Report::Dispatcher
+
+=head1 SYNOPSIS
+
+ dispatcher Log::Report::Dispatcher::File => 'stderr'
+   , to => \*STDERR, accept => 'NOTICE-';
+
+ # close a dispatcher
+ dispatcher close => 'stderr';
+
+ # let dispatcher open and close the file
+ dispatcher FILE => 'mylog', to => '/var/log/mylog'
+   , charset => 'utf-8';
+ ...
+ dispatcher close => 'mylog';  # will close file
+
+ # open yourself, then also close yourself
+ open OUT, ">:encoding('iso-8859-1')", '/var/log/mylog'
+     or fault "...";
+ dispatcher FILE => 'mylog', to => \*OUT;
+ ...
+ dispatcher close => 'mylog';  
+ close OUT;
+
+ # dispatch into a scalar
+ my $output = '';
+ open $outfile, '>', \$output;
+ dispatcher FILE => 'into-scalar', to => \$outfile;
+ ...
+ dispatcher close => 'into-scalar';
+ print $output;
+
+=head1 DESCRIPTION
+
+This basic file logger accepts an file-handle or filename as destination.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item $obj-E<gt>B<close>()
+
+Only when initiated with a FILENAME, the file will be closed.  In any
+other case, nothing will be done.
+
+=item Log::Report::Dispatcher::File-E<gt>B<new>(TYPE, NAME, OPTIONS)
+
+ -Option       --Defined in             --Default
+  accept         Log::Report::Dispatcher  depend on mode
+  charset        Log::Report::Dispatcher  LOCALE
+  format_reason  Log::Report::Dispatcher  'LOWERCASE'
+  locale         Log::Report::Dispatcher  <system locale>
+  mode           Log::Report::Dispatcher  'NORMAL'
+  replace                                 false
+  to                                      <required>
+
+=over 2
+
+=item accept => REASONS
+
+=item charset => CHARSET
+
+=item format_reason => 'UPPERCASE'|'LOWERCASE'|'UCFIRST'|'IGNORE'|CODE
+
+=item locale => LOCALE
+
+=item mode => 'NORMAL'|'VERBOSE'|'ASSERT'|'DEBUG'|0..3
+
+=item replace => BOOLEAN
+
+Only used in combination with a FILENAME: throw away the old file
+if it exists.  Probably you wish to append to existing information.
+
+Use the LOCALE setting by default, which is LC_CTYPE or LC_ALL or LANG
+(in that order).  If these contain a character-set which Perl understands,
+then that is used, otherwise silently ignored.
+
+=item to => FILENAME|FILEHANDLE|OBJECT
+
+You can either specify a FILENAME, which is opened in append mode with
+autoflush on. Or pass any kind of FILE-HANDLE or some OBJECT which
+implements a C<print()> method. You probably want to have autoflush
+enabled on your FILE-HANDLES.
+
+When cleaning-up the dispatcher, the file will only be closed in case
+of a FILENAME.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<filename>()
+
+Returns the name of the opened file, or C<undef> in case this dispatcher
+was started from a file-handle or file-object.
+
+=item $obj-E<gt>B<isDisabled>()
+
+See L<Log::Report::Dispatcher/"Accessors">
+
+=item $obj-E<gt>B<mode>()
+
+See L<Log::Report::Dispatcher/"Accessors">
+
+=item $obj-E<gt>B<name>()
+
+See L<Log::Report::Dispatcher/"Accessors">
+
+=item $obj-E<gt>B<needs>()
+
+See L<Log::Report::Dispatcher/"Accessors">
+
+=item $obj-E<gt>B<type>()
+
+See L<Log::Report::Dispatcher/"Accessors">
+
+=back
+
+=head2 Logging
+
+=over 4
+
+=item $obj-E<gt>B<collectLocation>()
+
+=item Log::Report::Dispatcher::File-E<gt>B<collectLocation>()
+
+See L<Log::Report::Dispatcher/"Logging">
+
+=item $obj-E<gt>B<collectStack>([MAXDEPTH])
+
+=item Log::Report::Dispatcher::File-E<gt>B<collectStack>([MAXDEPTH])
+
+See L<Log::Report::Dispatcher/"Logging">
+
+=item $obj-E<gt>B<log>(HASH-of-OPTIONS, REASON, MESSAGE)
+
+See L<Log::Report::Dispatcher/"Logging">
+
+=item $obj-E<gt>B<stackTraceLine>(OPTIONS)
+
+=item Log::Report::Dispatcher::File-E<gt>B<stackTraceLine>(OPTIONS)
+
+See L<Log::Report::Dispatcher/"Logging">
+
+=item $obj-E<gt>B<translate>(HASH-of-OPTIONS, REASON, MESSAGE)
+
+See L<Log::Report::Dispatcher/"Logging">
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Log-Report distribution version 0.992,
+built on December 21, 2012. Website: F<http://perl.overmeer.net/log-report/>
+
+=head1 LICENSE
+
+Copyrights 2007-2012 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

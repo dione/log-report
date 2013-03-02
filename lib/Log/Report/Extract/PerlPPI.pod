@@ -1,0 +1,108 @@
+=head1 NAME
+
+Log::Report::Extract::PerlPPI - Collect translatable strings from Perl using PPI
+
+=head1 INHERITANCE
+
+ Log::Report::Extract::PerlPPI
+   is a Log::Report::Extract
+
+=head1 SYNOPSIS
+
+ my $ppi = Log::Report::Extract::PerlPPI->new
+  ( lexicon => '/usr/share/locale'
+  );
+ $ppi->process('lib/My/Pkg.pm');  # many times
+ $ppi->showStats;
+ $ppi->write;
+
+ # See script  xgettext-perl
+
+=head1 DESCRIPTION
+
+This module helps maintaining the POT files, updating the list of
+message-ids which are kept in them.  After initiation, the L<process()|Log::Report::Extract::PerlPPI/"Processors">
+method needs to be called with all files which changed since last processing
+and the existing PO files will get updated accordingly.  If no translations
+exist yet, one C<textdomain/xx.po> file will be created.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Log::Report::Extract::PerlPPI-E<gt>B<new>(OPTIONS)
+
+See L<Log::Report::Extract/"Constructors">
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<charset>()
+
+See L<Log::Report::Extract/"Accessors">
+
+=item $obj-E<gt>B<domains>()
+
+See L<Log::Report::Extract/"Accessors">
+
+=item $obj-E<gt>B<index>()
+
+See L<Log::Report::Extract/"Accessors">
+
+=item $obj-E<gt>B<pots>(DOMAIN)
+
+See L<Log::Report::Extract/"Accessors">
+
+=back
+
+=head2 Processors
+
+=over 4
+
+=item $obj-E<gt>B<process>(FILENAME, OPTIONS)
+
+Update the domains mentioned in the FILENAME.  All textdomains defined
+in the file will get updated automatically, but not written before
+all files where processed.
+
+ -Option --Default
+  charset  'iso-8859-1'
+
+=over 2
+
+=item charset => STRING
+
+=back
+
+=item $obj-E<gt>B<showStats>([DOMAINs])
+
+See L<Log::Report::Extract/"Processors">
+
+=item $obj-E<gt>B<store>(DOMAIN, FILENAME, LINENR, MSG, [MSG_PLURAL])
+
+See L<Log::Report::Extract/"Processors">
+
+=item $obj-E<gt>B<write>([DOMAIN])
+
+See L<Log::Report::Extract/"Processors">
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Log-Report distribution version 0.992,
+built on December 21, 2012. Website: F<http://perl.overmeer.net/log-report/>
+
+=head1 LICENSE
+
+Copyrights 2007-2012 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

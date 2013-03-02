@@ -1,0 +1,185 @@
+=head1 NAME
+
+Log::Report::Dispatcher::Syslog - send messages to syslog
+
+=head1 INHERITANCE
+
+ Log::Report::Dispatcher::Syslog
+   is a Log::Report::Dispatcher
+
+=head1 SYNOPSIS
+
+ # add syslog dispatcher
+ dispatcher SYSLOG => 'syslog', accept => 'NOTICE-'
+   , format_reason => 'IGNORE'
+   , to_prio => [ 'ALERT-' => 'err' ];
+
+ # disable default dispatcher, when daemon
+ dispatcher close => 'default';
+
+=head1 DESCRIPTION
+
+This dispatchers produces output to syslog, based on the Sys::Syslog
+module (which will NOT be automatically installed for you, because some
+systems have a problem with this dependency).
+
+The REASON for a message often uses names which are quite similar to
+the log-levels used by syslog.  However: they have a different purpose.
+The REASON is used by the programmer to indicate the cause of the message:
+whether it was able to handle a certain situation.  The syslog levels
+are there for the user's of the program (with syslog usually the
+system administrators).  It is not unusual to see a "normal" error
+or mistake as a very serious situation in a production environment. So,
+you may wish to translate any message above reason MISTAKE into a LOG_CRIT.
+
+The default translation table is list below.  You can change the mapping
+using L<new(to_prio)|Log::Report::Dispatcher::Syslog/"Constructors">.  See example in SYNOPSIS.
+
+  TRACE   => LOG_DEBUG    ERROR   => LOG_ERR
+  ASSERT  => LOG_DEBUG    FAULT   => LOG_ERR
+  INFO    => LOG_INFO     ALERT   => LOG_ALERT
+  NOTICE  => LOG_NOTICE   FAILURE => LOG_EMERG
+  WARNING => LOG_WARNING  PANIC   => LOG_CRIT
+  MISTAKE => LOG_WARNING
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item $obj-E<gt>B<close>()
+
+See L<Log::Report::Dispatcher/"Constructors">
+
+=item Log::Report::Dispatcher::Syslog-E<gt>B<new>(TYPE, NAME, OPTIONS)
+
+With syslog, people tend not to include the REASON of the message
+in the logs, because that is already used to determine the destination
+of the message.
+
+ -Option       --Defined in             --Default
+  accept         Log::Report::Dispatcher  depend on mode
+  charset        Log::Report::Dispatcher  <undef>
+  facility                                'user'
+  flags                                   'pid,nowait'
+  format_reason  Log::Report::Dispatcher  'IGNORE'
+  identity                                <basename $0>
+  locale         Log::Report::Dispatcher  <system locale>
+  logsocket                               undef
+  mode           Log::Report::Dispatcher  'NORMAL'
+  to_prio                                 []
+
+=over 2
+
+=item accept => REASONS
+
+=item charset => CHARSET
+
+=item facility => STRING
+
+The possible values for this depend (a little) on the system.  POSIX
+only defines 'user' and 'local0' upto 'local7'.
+
+=item flags => STRING
+
+Any combination of flags as defined by Sys::Syslog, for instance
+C<pid>, C<ndelay>, and C<nowait>.
+
+=item format_reason => 'UPPERCASE'|'LOWERCASE'|'UCFIRST'|'IGNORE'|CODE
+
+=item identity => STRING
+
+=item locale => LOCALE
+
+=item logsocket => 'unix'|'inet'|'stream'
+
+If specified, the log socket type will be initialized to this before
+openlog is called.  If not specified, the system default is used.
+
+=item mode => 'NORMAL'|'VERBOSE'|'ASSERT'|'DEBUG'|0..3
+
+=item to_prio => ARRAY-of-PAIRS
+
+See L<reasonToPrio()|Log::Report::Dispatcher::Syslog/"Logging">.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<isDisabled>()
+
+See L<Log::Report::Dispatcher/"Accessors">
+
+=item $obj-E<gt>B<mode>()
+
+See L<Log::Report::Dispatcher/"Accessors">
+
+=item $obj-E<gt>B<name>()
+
+See L<Log::Report::Dispatcher/"Accessors">
+
+=item $obj-E<gt>B<needs>()
+
+See L<Log::Report::Dispatcher/"Accessors">
+
+=item $obj-E<gt>B<type>()
+
+See L<Log::Report::Dispatcher/"Accessors">
+
+=back
+
+=head2 Logging
+
+=over 4
+
+=item $obj-E<gt>B<collectLocation>()
+
+=item Log::Report::Dispatcher::Syslog-E<gt>B<collectLocation>()
+
+See L<Log::Report::Dispatcher/"Logging">
+
+=item $obj-E<gt>B<collectStack>([MAXDEPTH])
+
+=item Log::Report::Dispatcher::Syslog-E<gt>B<collectStack>([MAXDEPTH])
+
+See L<Log::Report::Dispatcher/"Logging">
+
+=item $obj-E<gt>B<log>(HASH-of-OPTIONS, REASON, MESSAGE)
+
+See L<Log::Report::Dispatcher/"Logging">
+
+=item $obj-E<gt>B<reasonToPrio>(REASON)
+
+Returns a level which is understood by syslog(3), based on a translation
+table.  This can be changed with L<new(to_prio)|Log::Report::Dispatcher::Syslog/"Constructors">.
+
+=item $obj-E<gt>B<stackTraceLine>(OPTIONS)
+
+=item Log::Report::Dispatcher::Syslog-E<gt>B<stackTraceLine>(OPTIONS)
+
+See L<Log::Report::Dispatcher/"Logging">
+
+=item $obj-E<gt>B<translate>(HASH-of-OPTIONS, REASON, MESSAGE)
+
+See L<Log::Report::Dispatcher/"Logging">
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Log-Report distribution version 0.992,
+built on December 21, 2012. Website: F<http://perl.overmeer.net/log-report/>
+
+=head1 LICENSE
+
+Copyrights 2007-2012 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+
